@@ -6,12 +6,19 @@
   "background_color": "#0b0c10",
   "theme_color": "#0b0c10",
   "description": "Demo smartphone UI — installierbare PWA",
-  "orientation": "landscape",
+  "orientation": "any",
   "icons": [
     {
       "src": "./icon.svg",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "https://dicebear.com",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
