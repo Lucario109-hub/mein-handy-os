@@ -1,3 +1,9 @@
+---
+
+### 2. Datei: `manifest.json` (Komplett)
+Ersetze deine `manifest.json` mit diesem Inhalt. Hier nutzen wir das externe, sichere PNG-Icon von *Dicebear*, damit Chrome beim Symbol definitiv nicht mehr blockiert.
+
+```json
 {
   "name": "Modern Minimalist OS",
   "short_name": "M‑OS",
