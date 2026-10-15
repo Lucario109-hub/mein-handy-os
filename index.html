@@ -73,7 +73,7 @@
     .battery-icon::after {
       content: ''; position: absolute; right: -3px; top: 2px; width: 2px; height: 4px; background: rgba(255, 255, 255, 0.4); border-radius: 0 1px 1px 0;
     }
-    .battery-level { height: 100%; width: 100%; background: var(--accent-green); border-radius: 1px; }
+    .battery-level { height: 100%; width: 100%; background: var(--accent-green); border-radius: 1px; transition: width 0.3s ease; }
 
     /* App-Grid: Optimiert für horizontale Navigation auf kleinen Displays */
     .grid {
@@ -193,7 +193,7 @@
       <div class="status-right">
         <span id="live-date" style="font-size: 11px;">01. Jan</span>
         <div class="battery">
-          <div class="battery-icon"><div class="battery-level"></div></div>
+          <div class="battery-icon"><div class="battery-level" id="bat-level" style="width: 100%;"></div></div>
         </div>
       </div>
     </div>
@@ -266,5 +266,109 @@
       // Zeit
       let hh = String(now.getHours()).padStart(2, '0');
       let mm = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('live-time').innerText = `${hh}:${mm}`;
-      
+      document.getElementById('live-time').innerText = ${hh}:${mm};
+// Datum
+const options = { day: '2-digit', month: 'short' };
+document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', options);
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
+// 2. LIVE BATTERIE LOGIK (Web API)
+if ('getBattery' in navigator) {
+navigator.getBattery().then(battery => {
+function updateBatteryUI() {
+document.getElementById('bat-level').style.width = (battery.level * 100) + '%';
+}
+updateBatteryUI();
+battery.addEventListener('levelchange', updateBatteryUI);
+});
+}
+// 3. WINDOW MANAGER LOGIK
+let activeStream = null;
+function openApp(id) {
+document.getElementById(id).classList.add('show');
+if (id === 'cam-win') startKamera();
+}
+function closeApp(id) {
+document.getElementById(id).classList.remove('show');
+if (id === 'cam-win') stopKamera();
+}
+// 4. KAMERA STREAM LOGIK (WebRTC)
+async function startKamera() {
+const video = document.getElementById('camera-stream');
+const errDiv = document.getElementById('camera-error');
+errDiv.style.display = "none";
+try {
+activeStream = await navigator.mediaDevices.getUserMedia({
+video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+audio: false
+});
+video.srcObject = activeStream;
+} catch (err) {
+console.error("Kamerafehler: ", err);
+errDiv.innerText = "Fehler: Keine Kamera gefunden oder Zugriff verweigert.";
+errDiv.style.display = "block";
+}
+}
+function stopKamera() {
+if (activeStream) {
+activeStream.getTracks().forEach(track => track.stop());
+activeStream = null;
+}
+document.getElementById('camera-stream').srcObject = null;
+}
+// 5. TIC-TAC-TOE SPIEL LOGIK
+let boardState = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
+let gameActive = true;
+// Vollständige Gewinn-Kombinationen (Indizes im Grid)
+const winConditions = [, [3, 4, 5], [6, 7, 8], // Horizontal, [1, 4, 7], [2, 5, 8], // Vertikal, [2, 4, 6]             // Diagonal
+];
+function makeMove(cellIndex) {
+const cells = document.querySelectorAll('.ttt-cell');
+if (boardState[cellIndex] !== "" || !gameActive) return;
+boardState[cellIndex] = currentPlayer;
+cells[cellIndex].innerText = currentPlayer;
+cells[cellIndex].classList.add(currentPlayer);
+checkResult();
+}
+function checkResult() {
+let roundWon = false;
+for (let i = 0; i < winConditions.length; i++) {
+const [a, b, c] = winConditions[i];
+if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+roundWon = true;
+break;
+}
+}
+if (roundWon) {
+document.getElementById('ttt-status').innerText = Gewonnen: Spieler ${currentPlayer}!;
+gameActive = false;
+return;
+}
+if (!boardState.includes("")) {
+document.getElementById('ttt-status').innerText = "Unentschieden!";
+gameActive = false;
+return;
+}
+currentPlayer = currentPlayer === "X" ? "O" : "X";
+document.getElementById('ttt-status').innerText = Spieler ${currentPlayer} ist dran;
+}
+function resetGame() {
+boardState = ["", "", "", "", "", "", "", "", ""];
+currentPlayer = "X";
+gameActive = true;
+document.getElementById('ttt-status').innerText = "Spieler X ist dran";
+document.querySelectorAll('.ttt-cell').forEach(cell => {
+cell.innerText = "";
+cell.className = "ttt-cell";
+});
+}
+// 6. SERVICE WORKER REGISTRIERUNG
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+navigator.serviceWorker.register('./sw.js')
+.then(reg => console.log('Service Worker aktiv: ', reg.scope))
+.catch(err => console.error('Service Worker Fehler: ', err));
+});
+}
