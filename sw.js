@@ -1,21 +1,25 @@
 // 1. LIVE UHRZEIT & DATUM LOGIK
 function updateDateTime() {
-  const now = new Date();
-  
-  // Zeit berechnen (Stunden:Minuten)
-  let hh = String(now.getHours()).padStart(2, '0');
-  let mm = String(now.getMinutes()).padStart(2, '0');
-  
-  const timeEl = document.getElementById('live-time');
-  if (timeEl) {
-    timeEl.innerText = hh + ":" + mm;
-  }
-  
-  // Datum berechnen (z. B. Do., 15. Okt.)
-  const dateEl = document.getElementById('live-date');
-  if (dateEl) {
-    const options = { weekday: 'short', day: '2-digit', month: 'short' };
-    dateEl.innerText = now.toLocaleDateString('de-DE', options);
+  try {
+    const now = new Date();
+    
+    // Zeit berechnen (Stunden:Minuten)
+    let hh = String(now.getHours()).padStart(2, '0');
+    let mm = String(now.getMinutes()).padStart(2, '0');
+    
+    const timeEl = document.getElementById('live-time');
+    if (timeEl) {
+      timeEl.innerText = hh + ":" + mm;
+    }
+    
+    // Datum berechnen (z. B. Do., 15. Okt.)
+    const dateEl = document.getElementById('live-date');
+    if (dateEl) {
+      const options = { weekday: 'short', day: '2-digit', month: 'short' };
+      dateEl.innerText = now.toLocaleDateString('de-DE', options);
+    }
+  } catch (e) {
+    console.error("Fehler bei der Uhrzeit:", e);
   }
 }
 
@@ -48,7 +52,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   // Installations-Event im Speicher merken
   deferredPrompt = e;
   
-  // Blauer Leuchteffekt für das Optionen-Zahnrad (Signalisiert: Klick bereit!)
+  // Blauer Leuchteffekt für das Optionen-Zahnrad
   const optIcon = document.querySelector('.app:nth-child(8) .icon');
   if (optIcon) {
     optIcon.style.boxShadow = "0 0 15px var(--accent-blue)";
@@ -134,7 +138,7 @@ function stopKamera() {
 }
 
 
-// 6. SERVICE WORKER AKTIVIERUNG (OFFLINE-MODUS)
+// 6. SERVICE WORKER REGISTRIERUNG
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
