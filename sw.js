@@ -1,5 +1,11 @@
-const CACHE = 'mos-v1';
-const FILES = ['./', 'index.html', 'manifest.json'];
+const CACHE = 'mos-v2';
+const FILES = [
+  './', 
+  'index.html', 
+  'manifest.json',
+  'https://flaticon.com',
+  'https://flaticon.com'
+];
 
 self.addEventListener('install', e=>{
   e.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
