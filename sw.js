@@ -1,4 +1,4 @@
-const CACHE = 'mos-v6';
+const CACHE = 'mos-v8';
 const FILES = [
   './', 
   './index.html', 
@@ -7,7 +7,6 @@ const FILES = [
   'https://dicebear.com'
 ];
 
-// Installieren und Ressourcen cachen
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
@@ -16,7 +15,6 @@ self.addEventListener('install', e => {
   );
 });
 
-// Aktivieren und alten Cache bereinigen
 self.addEventListener('activate', e => { 
   e.waitUntil(
     caches.keys().then(keys => {
@@ -29,7 +27,6 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Netzwerk-First / Cache-Fallback Strategie
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
