@@ -2,417 +2,269 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <!-- viewport-fit=cover und Deaktivierung von Zoom für echtes App-Feeling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Modern Minimalist OS</title>
   <meta name="description" content="Moderne Smartphone UI — PWA Demo" />
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0b0c10">
   <style>
-    :root{
-      --bg-1:#0b0c10; --bg-2:#15161b;
-      --muted:rgba(255,255,255,0.75);
-      --accent-blue:#2f80ed; --accent-green:#30d158; --accent-orange:#ff9f0a;
-      --radius:14px; --shadow:0 12px 40px rgba(0,0,0,0.6);
-      --transition:220ms cubic-bezier(0.2,0.9,0.2,1);
+    :root {
+      --bg-1: #0b0c10; 
+      --bg-2: #15161b;
+      --muted: rgba(255, 255, 255, 0.75);
+      --accent-blue: #2f80ed; 
+      --accent-green: #30d158; 
+      --accent-orange: #ff9f0a;
+      --accent-red: #ff453a;
+      --radius: 12px; 
+      --shadow: 0 8px 30px rgba(0,0,0,0.7);
+      --transition: 180ms cubic-bezier(0.2, 0.9, 0.2, 1);
     }
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-    html,body{height:100%;background:linear-gradient(180deg,#070708 0%, #0f1013 100%);color:#fff}
-    .viewport{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .screen{
-      width:412px; height:920px; border-radius:34px; padding:18px;
-      background:linear-gradient(180deg,var(--bg-2),#0c0d11);
-      box-shadow: 0 40px 120px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-      position:relative; overflow:hidden; display:flex;flex-direction:column;
-      -webkit-user-select:none; user-select:none;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, -apple-system, sans-serif; }
+    
+    /* Native Querformat-Optimierung für das 3,5-Zoll-Display */
+    html, body { 
+      height: 100vh; 
+      width: 100vw;
+      background: var(--bg-1); 
+      color: #fff; 
+      overflow: hidden;
+      overscroll-behavior: contain;
+      -webkit-user-select: none; 
+      user-select: none;
     }
 
-    /* Status */
-    .status-bar{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:999px;border:1px solid rgba(255,255,255,0.03);font-size:13px;font-weight:600;color:var(--muted)}
-    .status-left, .status-right{display:flex;gap:8px;align-items:center}
-    .battery{display:flex;align-items:center;gap:8px}
-    .battery-icon{width:22px;height:12px;border:1px solid rgba(255,255,255,0.12);border-radius:3px;position:relative;padding:1px;background:rgba(255,255,255,0.01)}
-    .battery-icon::after{content:'';position:absolute;right:-4px;top:3px;width:3px;height:6px;background:rgba(255,255,255,0.07);border-radius:1px}
-    .battery-level{height:100%;background:var(--accent-green);border-radius:1px;transition:width var(--transition),background var(--transition)}
-
-    /* Grid */
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:22px 6px 12px 6px;flex:1;align-content:start}
-    .app{display:flex;flex-direction:column;align-items:center;gap:8px;background:transparent;border:none;color:inherit;cursor:pointer}
-    .app:focus{outline:3px solid rgba(47,128,237,0.14);border-radius:12px}
-    .icon{
-      width:68px;height:68px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;
-      background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);
-      transition:transform var(--transition),box-shadow var(--transition),background var(--transition);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    /* Das OS füllt das gesamte Display aus */
+    .os-surface {
+      width: 100%;
+      height: 100%;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(145deg, #070708 0%, #111318 100%);
+      position: relative;
     }
-    .app:active .icon{transform:scale(.94)}
-    .label{font-size:12px;color:var(--muted);white-space:nowrap}
 
-    /* App window */
-    .window{
-      position:absolute;left:18px;right:18px;top:80px;bottom:28px;border-radius:18px;background:#0b0c10;border:1px solid rgba(255,255,255,0.06);
-      box-shadow:var(--shadow);display:flex;flex-direction:column;transform:translateY(12px) scale(.99);opacity:0;pointer-events:none;transition:transform var(--transition),opacity var(--transition);
-      z-index:40;padding:10px;backdrop-filter:blur(6px)
+    /* Status Bar am oberen Rand */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      height: 24px;
     }
-    .window.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
-    .win-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.04)}
-    .win-title{font-weight:700;font-size:15px}
-    .win-body{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto}
-    .win-actions button{background:transparent;border:none;color:var(--muted);padding:8px;border-radius:10px;cursor:pointer}
-    .close{background:rgba(255,69,58,0.1);color:#ff7b72;padding:8px 12px;border-radius:10px;font-weight:700}
+    .status-left, .status-right { display: flex; gap: 10px; align-items: center; }
+    .battery { display: flex; align-items: center; gap: 6px; }
+    .battery-icon {
+      width: 20px;
+      height: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      position: relative;
+      padding: 1px;
+    }
+    .battery-icon::after {
+      content: ''; position: absolute; right: -3px; top: 2px; width: 2px; height: 4px; background: rgba(255, 255, 255, 0.4); border-radius: 0 1px 1px 0;
+    }
+    .battery-level { height: 100%; width: 100%; background: var(--accent-green); border-radius: 1px; }
 
-    /* Small helpers */
-    input[type="text"], .urlbar{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);color:var(--muted);font-size:14px}
-    iframe{width:100%;height:100%;border-radius:10px;border:0}
-    video, canvas{max-width:100%;border-radius:10px}
-    .controls{display:flex;gap:10px;align-items:center}
-    .btn{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
-    .small{font-size:13px;padding:6px 8px}
+    /* App-Grid: Optimiert für horizontale Navigation auf kleinen Displays */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 16px;
+      padding: 16px 8px;
+      flex: 1;
+      align-content: center;
+      justify-items: center;
+    }
+    .app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      width: 76px;
+    }
+    .app:focus { outline: none; }
+    .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .app:active .icon { transform: scale(0.92); }
+    .label { font-size: 11px; color: var(--muted); text-align: center; font-weight: 500; }
 
-    /* responsive for small preview */
-    @media (max-width:420px){ .screen{width:360px;height:800px} .icon{width:60px;height:60px;border-radius:16px} }
+    /* App-Fenster: Überlappt das Grid exakt im verfügbaren Platz unter der Statusbar */
+    .window {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 38px;
+      bottom: 8px;
+      border-radius: var(--radius);
+      background: #0b0c10;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transform: translateY(10px) scale(0.98);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform var(--transition), opacity var(--transition);
+      z-index: 40;
+    }
+    .window.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+    .win-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .win-title { font-weight: 600; font-size: 13px; color: #fff; }
+    .win-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; overflow: hidden; position: relative; }
+    .close-btn {
+      background: rgba(255, 69, 58, 0.15);
+      color: #ff7b72;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+    }
 
-    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+    /* Kamera Feature Styles */
+    .camera-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; border-radius: 8px; overflow: hidden; position: relative; }
+    #camera-stream { width: 100%; height: 100%; object-fit: cover; }
+    .cam-error { color: var(--accent-red); font-size: 12px; text-align: center; padding: 10px; position: absolute; }
+
+    /* Tic-Tac-Toe Feature Styles */
+    .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 160px; height: 160px; }
+    .ttt-cell {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .ttt-cell:active { background: rgba(255,255,255,0.08); }
+    .ttt-cell.X { color: var(--accent-blue); }
+    .ttt-cell.O { color: var(--accent-orange); }
+    .ttt-sidebar { display: flex; flex-direction: column; gap: 10px; margin-left: 20px; align-items: flex-start; }
+    .ttt-status { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .btn { background: var(--accent-blue); border: none; padding: 6px 12px; color: #fff; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; }
+    
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
 <body>
-  <div class="viewport">
-    <main class="screen" role="region" aria-label="Moderne OS Oberfläche" tabindex="0">
-      <div class="status-bar" role="status">
-        <div class="status-left">
-          <div id="time" aria-live="polite">--:--</div>
-          <div id="date" class="label" aria-live="polite">-- ---</div>
-        </div>
-        <div class="status-right">
-          <div class="battery" aria-label="Akku">
-            <div class="battery-icon" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
-              <div class="battery-level" id="battery" style="width:100%"></div>
-            </div>
-            <div id="batteryPct" class="label">100%</div>
-          </div>
+
+  <div class="os-surface">
+    <!-- Status-Bar -->
+    <div class="status-bar">
+      <div class="status-left">
+        <span id="live-time">00:00</span>
+      </div>
+      <div class="status-right">
+        <span id="live-date" style="font-size: 11px;">01. Jan</span>
+        <div class="battery">
+          <div class="battery-icon"><div class="battery-level"></div></div>
         </div>
       </div>
+    </div>
 
-      <section class="grid" role="grid" aria-label="App Raster" id="appsGrid">
-        <button class="app" data-app="browser" aria-label="Browser" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">🌐</div><div class="label">Browser</div>
-        </button>
-
-        <button class="app" data-app="camera" aria-label="Kamera" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">📷</div><div class="label">Kamera</div>
-        </button>
-
-        <button class="app" data-app="games" aria-label="Spiele" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">🎮</div><div class="label">Games</div>
-        </button>
-
-        <button class="app" data-app="chat" aria-label="Chat" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">💬</div><div class="label">Chat</div>
-        </button>
-
-        <button class="app" data-app="music" aria-label="Musik" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">🎵</div><div class="label">Musik</div>
-        </button>
-
-        <button class="app" data-app="terminal" aria-label="Terminal" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">🖥️</div><div class="label">Terminal</div>
-        </button>
-
-        <button class="app" data-app="video" aria-label="Videos" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">📺</div><div class="label">Videos</div>
-        </button>
-
-        <button class="app" data-app="settings" aria-label="Einstellungen" role="gridcell" tabindex="0">
-          <div class="icon" aria-hidden="true">⚙️</div><div class="label">Optionen</div>
-        </button>
-      </section>
-
-      <!-- App window -->
-      <div id="win" class="window" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="winTitle">
-        <div class="win-header">
-          <div class="win-title" id="winTitle">App</div>
-          <div class="win-actions">
-            <button id="minBtn" class="btn small" title="Minimieren">—</button>
-            <button id="closeBtn" class="close" title="Schließen">Schließen</button>
-          </div>
+    <!-- Homescreen App-Grid -->
+    <div class="grid">
+      <!-- Kamera Button -->
+      <button class="app" onclick="openApp('cam-win')">
+        <div class="icon" style="color: var(--accent-green);">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
         </div>
-        <div id="winBody" class="win-body">Inhalt</div>
+        <div class="label">Kamera</div>
+      </button>
+
+      <!-- Tic-Tac-Toe Button -->
+      <button class="app" onclick="openApp('ttt-win')">
+        <div class="icon" style="color: var(--accent-orange);">
+          <svg viewBox="0 0 24 24"><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+        </div>
+        <div class="label">TicTacToe</div>
+      </button>
+    </div>
+
+    <!-- APP FENSTER: KAMERA -->
+    <div id="cam-win" class="window">
+      <div class="win-header">
+        <span class="win-title">Live Kamera Stream</span>
+        <button class="close-btn" onclick="closeApp('cam-win')">Schließen</button>
       </div>
-    </main>
+      <div class="win-body">
+        <div class="camera-container">
+          <div id="camera-error" class="cam-error" style="display:none;">Warte auf Kamerazugriff...</div>
+          <video id="camera-stream" autoplay playsinline muted></video>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP FENSTER: TIC-TAC-TOE -->
+    <div id="ttt-win" class="window">
+      <div class="win-header">
+        <span class="win-title">Tic-Tac-Toe</span>
+        <button class="close-btn" onclick="closeApp('ttt-win')">Schließen</button>
+      </div>
+      <div class="win-body">
+        <div class="ttt-board" id="board">
+          <div class="ttt-cell" onclick="makeMove(0)"></div>
+          <div class="ttt-cell" onclick="makeMove(1)"></div>
+          <div class="ttt-cell" onclick="makeMove(2)"></div>
+          <div class="ttt-cell" onclick="makeMove(3)"></div>
+          <div class="ttt-cell" onclick="makeMove(4)"></div>
+          <div class="ttt-cell" onclick="makeMove(5)"></div>
+          <div class="ttt-cell" onclick="makeMove(6)"></div>
+          <div class="ttt-cell" onclick="makeMove(7)"></div>
+          <div class="ttt-cell" onclick="makeMove(8)"></div>
+        </div>
+        <div class="ttt-sidebar">
+          <div class="ttt-status" id="ttt-status">Spieler X ist dran</div>
+          <button class="btn" onclick="resetGame()">Neu starten</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // --- Clock & Battery (simulate) ---
-    const timeEl = document.getElementById('time');
-    const dateEl = document.getElementById('date');
-    const batteryEl = document.getElementById('battery');
-    const batteryPct = document.getElementById('batteryPct');
-
-    const tFmt = new Intl.DateTimeFormat('de-DE', {hour:'2-digit',minute:'2-digit'});
-    const dFmt = new Intl.DateTimeFormat('de-DE', {weekday:'short',day:'numeric',month:'short'});
-
-    function updateClock(){
+    // 1. LIVE UHRZEIT & DATUM LOGIK
+    function updateDateTime() {
       const now = new Date();
-      timeEl.textContent = tFmt.format(now);
-      dateEl.textContent = dFmt.format(now);
-    }
-    updateClock(); setInterval(updateClock,30000);
-
-    function setBattery(pct){
-      const val = Math.max(0,Math.min(100,Math.round(pct)));
-      batteryEl.style.width = val + '%';
-      batteryPct.textContent = val + '%';
-      if(val <= 20) batteryEl.style.background = '#ff3b30';
-      else if(val <= 50) batteryEl.style.background = '#ff9f0a';
-      else batteryEl.style.background = '#30d158';
-      batteryEl.parentElement.setAttribute('aria-valuenow', String(val));
-    }
-    setBattery(86);
-
-    // --- PWA: Service worker register (if available) ---
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW failed',e));
-    }
-
-    // --- App system ---
-    const appsGrid = document.getElementById('appsGrid');
-    const win = document.getElementById('win');
-    const winTitle = document.getElementById('winTitle');
-    const winBody = document.getElementById('winBody');
-    const closeBtn = document.getElementById('closeBtn');
-    const minBtn = document.getElementById('minBtn');
-    let lastFocused = null;
-
-    appsGrid.addEventListener('click', e=>{
-      const btn = e.target.closest('.app'); if(!btn) return;
-      openApp(btn.dataset.app, btn);
-    });
-
-    // Keyboard navigation (arrow keys) for grid
-    appsGrid.addEventListener('keydown', e=>{
-      const btn = e.target.closest('.app'); if(!btn) return;
-      const focusables = Array.from(appsGrid.querySelectorAll('.app'));
-      const idx = focusables.indexOf(btn);
-      const cols = 4;
-      if(e.key === 'ArrowRight'){ e.preventDefault(); focusables[(idx+1)%focusables.length].focus(); }
-      if(e.key === 'ArrowLeft'){ e.preventDefault(); focusables[(idx-1+focusables.length)%focusables.length].focus(); }
-      if(e.key === 'ArrowDown'){ e.preventDefault(); focusables[(idx+cols)%focusables.length].focus(); }
-      if(e.key === 'ArrowUp'){ e.preventDefault(); focusables[(idx-cols+focusables.length)%focusables.length].focus(); }
-      if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openApp(btn.dataset.app, btn); }
-    });
-
-    function openApp(name, originBtn){
-      lastFocused = originBtn || document.activeElement;
-      winTitle.textContent = capitalize(name);
-      winBody.innerHTML = ''; win.setAttribute('aria-hidden','false'); win.classList.add('show');
-      closeBtn.focus();
-      // render content
-      switch(name){
-        case 'browser': renderBrowser(); break;
-        case 'camera': renderCamera(); break;
-        case 'music': renderMusic(); break;
-        case 'video': renderVideo(); break;
-        case 'terminal': renderTerminal(); break;
-        case 'chat': renderChat(); break;
-        case 'games': renderGames(); break;
-        case 'settings': renderSettings(); break;
-        default: winBody.textContent = 'Leerer Bereich';
-      }
-      // focus trap: basic
-      document.addEventListener('focus', trapFocus, true);
-    }
-
-    function closeApp(){
-      win.classList.remove('show'); win.setAttribute('aria-hidden','true');
-      document.removeEventListener('focus', trapFocus, true);
-      if(lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
-      // stop media tracks if any in window
-      const vids = winBody.querySelectorAll('video, audio');
-      vids.forEach(v=>{
-        if(v.srcObject && v.srcObject.getTracks) v.srcObject.getTracks().forEach(t=>t.stop());
-        if(!v.paused) v.pause();
-      });
-      const streams = winBody.querySelectorAll('canvas, iframe');
-      winBody.innerHTML = '';
-    }
-
-    function trapFocus(e){
-      if(!win.classList.contains('show')) return;
-      if(!win.contains(e.target)) { e.stopPropagation(); closeBtn.focus(); }
-    }
-
-    closeBtn.addEventListener('click', closeApp);
-    minBtn.addEventListener('click', ()=>{ win.classList.remove('show'); win.setAttribute('aria-hidden','true'); });
-
-    // Swipe down to close (touch)
-    let startY = null;
-    win.addEventListener('touchstart', e=>{ if(e.touches && e.touches[0]) startY = e.touches[0].clientY; });
-    win.addEventListener('touchmove', e=>{
-      if(!startY) return;
-      const dy = e.touches[0].clientY - startY;
-      if(dy > 80){ closeApp(); startY = null; }
-    });
-    win.addEventListener('touchend', ()=> startY = null);
-
-    // --- App renderers ---
-    function renderBrowser(){
-      const wrapper = document.createElement('div'); wrapper.style.width='100%'; wrapper.style.height='100%'; wrapper.style.display='flex'; wrapper.style.flexDirection='column'; wrapper.style.gap='10px';
-      const urlbar = document.createElement('input'); urlbar.type='text'; urlbar.className='urlbar'; urlbar.placeholder = 'https://example.org — Hinweis: externe Seiten können X-Frame-Options blockieren';
-      const iframeWrap = document.createElement('div'); iframeWrap.style.flex='1'; iframeWrap.style.borderRadius='12px'; iframeWrap.style.overflow='hidden';
-      const frame = document.createElement('iframe'); frame.src = 'about:blank'; frame.title = 'In-App Browser'; frame.loading='lazy';
-      iframeWrap.appendChild(frame);
-      const nav = document.createElement('div'); nav.className='controls'; nav.style.justifyContent='space-between';
-      const go = document.createElement('button'); go.className='btn small'; go.textContent='Öffnen'; go.onclick = ()=>{ let u = urlbar.value.trim(); if(!u) return; if(!u.match(/^https?:\/\//)) u='https://'+u; frame.src = u; };
-      const home = document.createElement('button'); home.className='btn small'; home.textContent='Home'; home.onclick = ()=>{ frame.src='about:blank'; urlbar.value = ''; };
-      nav.appendChild(home); nav.appendChild(go);
-      wrapper.appendChild(urlbar); wrapper.appendChild(iframeWrap); wrapper.appendChild(nav);
-      winBody.appendChild(wrapper);
-    }
-
-    function renderCamera(){
-      const container = document.createElement('div'); container.style.display='flex'; container.style.flexDirection='column'; container.style.gap='10px'; container.style.width='100%';
-      const video = document.createElement('video'); video.autoplay = true; video.playsInline = true; video.style.width='100%'; video.style.height='100%'; video.style.objectFit='cover';
-      const btnRow = document.createElement('div'); btnRow.className='controls'; btnRow.style.justifyContent='space-between';
-      const snap = document.createElement('button'); snap.className='btn'; snap.textContent='Foto machen';
-      const stop = document.createElement('button'); stop.className='btn'; stop.textContent='Stop';
-      btnRow.appendChild(stop); btnRow.appendChild(snap);
-      container.appendChild(video); container.appendChild(btnRow);
-      winBody.appendChild(container);
-
-      let stream = null;
-      navigator.mediaDevices && navigator.mediaDevices.getUserMedia ?
-        navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false})
-          .then(s => { stream = s; video.srcObject = s; })
-          .catch(e => { winBody.textContent = 'Kamera nicht verfügbar: ' + e.message; }) :
-        winBody.textContent = 'Kamera API nicht unterstützt';
-
-      snap.addEventListener('click', ()=>{
-        const canvas = document.createElement('canvas'); canvas.width = video.videoWidth || 1280; canvas.height = video.videoHeight || 720;
-        const ctx = canvas.getContext('2d'); ctx.drawImage(video,0,0,canvas.width,canvas.height);
-        const img = document.createElement('img'); img.src = canvas.toDataURL('image/jpeg'); img.style.maxWidth='100%'; winBody.appendChild(img);
-      });
-      stop.addEventListener('click', ()=>{ if(stream){ stream.getTracks().forEach(t=>t.stop()); video.srcObject = null; } });
-    }
-
-    function renderMusic(){
-      winBody.innerHTML = '';
-      const wrap = document.createElement('div'); wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.style.gap='12px'; wrap.style.width='100%';
-      const info = document.createElement('div'); info.textContent = 'Demo Synthesizer — WebAudio';
-      const play = document.createElement('button'); play.className='btn'; play.textContent='Play Tone';
-      const stop = document.createElement('button'); stop.className='btn'; stop.textContent='Stop';
-      const vol = document.createElement('input'); vol.type='range'; vol.min='0'; vol.max='1'; vol.step='0.01'; vol.value='0.3';
-      wrap.appendChild(info); wrap.appendChild(vol); wrap.appendChild(play); wrap.appendChild(stop);
-      winBody.appendChild(wrap);
-
-      let ctx=null, osc=null, gain=null;
-      play.addEventListener('click', async ()=>{
-        if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); gain = ctx.createGain(); gain.gain.value = vol.value; gain.connect(ctx.destination); osc = ctx.createOscillator(); osc.type='sine'; osc.frequency.value=440; osc.connect(gain); osc.start(); }
-      });
-      stop.addEventListener('click', ()=>{ if(osc){ osc.stop(); osc.disconnect(); osc=null; } if(gain){ gain.disconnect(); gain=null; } if(ctx){ ctx.close(); ctx=null; } });
-      vol.addEventListener('input', ()=>{ if(gain) gain.gain.value = vol.value; });
-    }
-
-    function renderVideo(){
-      winBody.innerHTML = '';
-      const v = document.createElement('video'); v.controls = true; v.autoplay = false; v.playsInline = true; v.style.width='100%';
-      // Try to use camera for demo; fallback to a short generated blob (blank)
-      if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
-        navigator.mediaDevices.getUserMedia({video:true,audio:false}).then(s=>{ v.srcObject = s; winBody.appendChild(v); v.play().catch(()=>{}); }).catch(e=>{
-          winBody.textContent = 'Keine Kamera für Video: ' + e.message;
-        });
-      } else {
-        // fallback: blank canvas-to-video is complex; show message
-        winBody.textContent = 'Kein Video verfügbar';
-      }
-    }
-
-    function renderTerminal(){
-      winBody.innerHTML = '';
-      const out = document.createElement('pre'); out.style.width='100%'; out.style.height='100%'; out.style.background='transparent'; out.style.overflow='auto'; out.style.fontSize='13px';
-      const input = document.createElement('input'); input.type='text'; input.className='urlbar'; input.placeholder='Befehl eingeben (help)';
-      winBody.appendChild(out); winBody.appendChild(input);
-      out.textContent = 'willkommen@device:~$ \n';
-      input.addEventListener('keydown', e=>{
-        if(e.key !== 'Enter') return;
-        const cmd = input.value.trim(); out.textContent += cmd + '\n';
-        input.value = '';
-        handleCmd(cmd, out);
-        out.scrollTop = out.scrollHeight;
-      });
-    }
-    function handleCmd(cmd, out){
-      const args = cmd.split(/\s+/);
-      switch(args[0]){
-        case 'help': out.textContent += 'verfügbare: help, date, echo, battery, clear\n'; break;
-        case 'date': out.textContent += new Date().toString() + '\n'; break;
-        case 'echo': out.textContent += args.slice(1).join(' ') + '\n'; break;
-        case 'battery': out.textContent += document.getElementById('batteryPct').textContent + '\n'; break;
-        case 'clear': out.textContent = ''; break;
-        default: out.textContent += `${args[0]}: Befehl nicht gefunden\n`;
-      }
-    }
-
-    function renderChat(){
-      winBody.innerHTML = '';
-      const area = document.createElement('div'); area.style.display='flex'; area.style.flexDirection='column'; area.style.gap='8px'; area.style.width='100%';
-      const feed = document.createElement('div'); feed.style.flex='1'; feed.style.overflow='auto'; feed.style.padding='8px'; feed.style.background='rgba(255,255,255,0.01)'; feed.style.borderRadius='10px';
-      const form = document.createElement('div'); form.style.display='flex'; form.style.gap='8px';
-      const txt = document.createElement('input'); txt.type='text'; txt.className='urlbar'; txt.placeholder='Nachricht schreiben';
-      const send = document.createElement('button'); send.className='btn'; send.textContent='Senden';
-      form.appendChild(txt); form.appendChild(send);
-      area.appendChild(feed); area.appendChild(form);
-      winBody.appendChild(area);
-
-      send.addEventListener('click', ()=>{ if(!txt.value) return; addMsg('Du', txt.value); txt.value=''; autoReply(feed); });
-      txt.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
-
-      function addMsg(who, text){ const p = document.createElement('div'); p.textContent = who + ': ' + text; p.style.padding='6px 8px'; p.style.borderRadius='8px'; p.style.background='rgba(255,255,255,0.02)'; feed.appendChild(p); feed.scrollTop = feed.scrollHeight; }
-      function autoReply(feedEl){ setTimeout(()=>{ addMsg('Bot','Danke — dies ist eine Demo-Antwort.'); }, 800); }
-    }
-
-    function renderGames(){
-      winBody.innerHTML = '';
-      const board = document.createElement('div'); board.style.display='grid'; board.style.gridTemplateColumns='repeat(3,1fr)'; board.style.gap='8px'; board.style.width='320px';
-      let cells = Array(9).fill(null); let turn='X'; function draw(){
-        board.innerHTML='';
-        cells.forEach((c,i)=>{
-          const b = document.createElement('button'); b.className='btn'; b.style.height='90px'; b.style.fontSize='32px'; b.textContent = c || '';
-          b.onclick = ()=>{ if(cells[i]) return; cells[i]=turn; turn = turn==='X'?'O':'X'; draw(); check(); };
-          board.appendChild(b);
-        });
-      }
-      const status = document.createElement('div'); status.className='label'; status.style.marginTop='8px'; const reset = document.createElement('button'); reset.className='btn'; reset.textContent='Neustart'; reset.onclick=()=>{cells=Array(9).fill(null); turn='X'; status.textContent=''; draw();}
-      winBody.appendChild(board); winBody.appendChild(status); winBody.appendChild(reset); draw();
-      function check(){
-        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-        for(const [a,b,c] of wins) if(cells[a] && cells[a]===cells[b] && cells[a]===cells[c]){ status.textContent = `${cells[a]} hat gewonnen!`; return; }
-        if(cells.every(Boolean)) status.textContent='Unentschieden';
-      }
-    }
-
-    function renderSettings(){
-      winBody.innerHTML = '';
-      const wrap = document.createElement('div'); wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.style.gap='12px';
-      wrap.innerHTML = `<div style="font-weight:700">Einstellungen</div>`;
-      const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center';
-      const lbl = document.createElement('div'); lbl.textContent='Dunkles Thema';
-      const toggle = document.createElement('input'); toggle.type='checkbox'; toggle.checked = true;
-      toggle.addEventListener('change', ()=>{ document.documentElement.style.filter = toggle.checked ? '': 'invert(0)'; });
-      row.appendChild(lbl); row.appendChild(toggle);
-      wrap.appendChild(row);
-      wrap.appendChild(document.createElement('hr'));
-      const info = document.createElement('div'); info.textContent='Version: 1.0 — Demo';
-      wrap.appendChild(info);
-      winBody.appendChild(wrap);
-    }
-
-    function capitalize(s){ return s && s[0].toUpperCase() + s.slice(1); }
-
-    // Close on Escape
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && win.classList.contains('show')) closeApp(); });
-
-    // initial focus
-    const firstApp = document.querySelector('.app');
-    if(firstApp) firstApp.focus();
-  </script>
-</body>
-            </html>
+      
+      // Zeit
+      let hh = String(now.getHours()).padStart(2, '0');
+      let mm = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('live-time').innerText = `${hh}:${mm}`;
+      
