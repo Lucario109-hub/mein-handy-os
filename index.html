@@ -5,48 +5,58 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mein Handy — Launcher</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
 </head>
 <body>
+  <!-- Top status bar with battery and clock -->
   <header class="topbar">
-    <div class="brand">lucario109-hub.github.io</div>
-    <div class="top-actions">
-      <button id="open-settings" aria-label="Einstellungen" class="icon-btn">⚙️</button>
+    <div class="top-left">
+      <div class="site">lucario109-hub.github.io</div>
+    </div>
+    <div class="top-right">
+      <div id="statusClock" class="status-clock" aria-hidden="true"></div>
+      <div id="battery" class="battery" aria-hidden="true">
+        <div class="battery-level" id="batteryLevel"></div>
+        <div class="battery-tip"></div>
+        <div class="battery-charging" id="batteryCharging" aria-hidden="true">⚡</div>
+      </div>
     </div>
   </header>
 
   <main class="screen" id="screenRoot">
     <div class="apps-grid" id="appsGrid" role="list">
+      <!-- app tiles with SVG icons -->
       <div class="app" data-app="browser" role="listitem" tabindex="0">
-        <div class="icon browser" aria-hidden="true"></div>
+        <div class="icon browser" aria-hidden="true"><img src="icons/browser.svg" alt=""/></div>
         <div class="label">Browser</div>
       </div>
       <div class="app" data-app="camera" role="listitem" tabindex="0">
-        <div class="icon camera" aria-hidden="true"></div>
+        <div class="icon camera" aria-hidden="true"><img src="icons/camera.svg" alt=""/></div>
         <div class="label">Kamera</div>
       </div>
       <div class="app" data-app="games" role="listitem" tabindex="0">
-        <div class="icon games" aria-hidden="true"></div>
+        <div class="icon games" aria-hidden="true"><img src="icons/games.svg" alt=""/></div>
         <div class="label">Games</div>
       </div>
       <div class="app" data-app="chat" role="listitem" tabindex="0">
-        <div class="icon chat" aria-hidden="true"></div>
+        <div class="icon chat" aria-hidden="true"><img src="icons/chat.svg" alt=""/></div>
         <div class="label">Chat</div>
       </div>
 
       <div class="app" data-app="music" role="listitem" tabindex="0">
-        <div class="icon music" aria-hidden="true"></div>
+        <div class="icon music" aria-hidden="true"><img src="icons/music.svg" alt=""/></div>
         <div class="label">Musik</div>
       </div>
       <div class="app" data-app="terminal" role="listitem" tabindex="0">
-        <div class="icon terminal" aria-hidden="true"></div>
+        <div class="icon terminal" aria-hidden="true"><img src="icons/terminal.svg" alt=""/></div>
         <div class="label">Terminal</div>
       </div>
       <div class="app" data-app="videos" role="listitem" tabindex="0">
-        <div class="icon videos" aria-hidden="true"></div>
+        <div class="icon videos" aria-hidden="true"><img src="icons/videos.svg" alt=""/></div>
         <div class="label">Videos</div>
       </div>
       <div class="app" data-app="options" role="listitem" tabindex="0">
-        <div class="icon options" aria-hidden="true"></div>
+        <div class="icon options" aria-hidden="true"><img src="icons/options.svg" alt=""/></div>
         <div class="label">Optionen</div>
       </div>
     </div>
