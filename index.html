@@ -2,64 +2,98 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Modern Minimalist OS</title>
-  <meta name="description" content="Moderne Smartphone UI — PWA Demo" />
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0b0c10">
-  <!-- iOS / Windows meta for better install behaviour -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="M-OS">
-  <link rel="apple-touch-icon" href="/icons/icon-180.png" />
-  <meta name="msapplication-TileColor" content="#0b0c10">
-  <meta name="msapplication-TileImage" content="/icons/icon-512.png">
-  <style>
-    :root{ --bg-1:#0b0c10; --bg-2:#15161b; --muted:rgba(255,255,255,0.75); --accent-blue:#2f80ed; --accent-green:#30d158; --accent-orange:#ff9f0a; --radius:14px; --shadow:0 12px 40px rgba(0,0,0,0.6); --transition:220ms cubic-bezier(0.2,0.9,0.2,1); }
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,sans-serif}
-    html,body{height:100%;background:linear-gradient(180deg,#070708 0%, #0f1013 100%);color:#fff;overflow:hidden}
-    .viewport{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .screen{width:100%;max-width:412px;height:100vh;max-height:920px;border-radius:34px;padding:18px;background:linear-gradient(180deg,var(--bg-2),#0c0d11);box-shadow:0 40px 120px rgba(0,0,0,0.6);position:relative;overflow:hidden;display:flex;flex-direction:column}
-    .status-bar{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:rgba(255,255,255,0.02);border-radius:999px;border:1px solid rgba(255,255,255,0.03);font-size:13px;font-weight:600;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:22px 6px 12px 6px;flex:1;align-content:start}
-    .app{display:flex;flex-direction:column;align-items:center;gap:8px;background:transparent;border:none;color:inherit;cursor:pointer}
-    .icon{width:68px;height:68px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);transition:transform var(--transition),box-shadow var(--transition);box-shadow:0 6px 18px rgba(0,0,0,0.6)}
-    .label{font-size:12px;color:var(--muted);white-space:nowrap}
-    .window{position:absolute;left:18px;right:18px;top:80px;bottom:28px;border-radius:18px;background:#0b0c10;border:1px solid rgba(255,255,255,0.06);box-shadow:var(--shadow);display:flex;flex-direction:column;transform:translateY(12px) scale(.99);opacity:0;pointer-events:none;transition:transform var(--transition),opacity var(--transition);z-index:40;padding:10px}
-    .window.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
-    .camera-container{width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;border-radius:8px;overflow:hidden;position:relative}
-    #camera-stream{width:100%;height:100%;object-fit:cover}
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mein Handy — Launcher</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="viewport">
-    <div class="screen">
-      <div class="status-bar">
-        <div class="status-left"><span id="live-time">00:00</span><span id="live-date" style="margin-left:6px">Do., 15. Okt.</span></div>
-        <div class="status-right"><div class="battery"><span id="bat-percent" style="font-size:11px">86%</span><div class="battery-icon" style="width:22px;height:12px;border:1px solid rgba(255,255,255,0.12);border-radius:3px;position:relative;background:rgba(255,255,255,0.01);overflow:hidden"><div id="bat-level" class="battery-level" style="width:86%;height:100%;background:var(--accent-green)"></div></div></div></div>
-      </div>
-      <div class="grid">
-        <button class="app" onclick="openApp('browser-win')" aria-controls="browser-win"><div class="icon" style="color:var(--accent-blue)"><svg viewBox="0 0 24 24" width="28" height="28"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg></div><div class="label">Browser</div></button>
-        <button class="app" onclick="openApp('cam-win')" aria-controls="cam-win"><div class="icon" style="color:#a8b2c1"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg></div><div class="label">Kamera</div></button>
-        <button class="app" onclick="openApp('games-win')" aria-controls="games-win"><div class="icon" style="color:#6e7c91">🎮</div><div class="label">Games</div></button>
-        <button class="app" onclick="openApp('chat-win')" aria-controls="chat-win"><div class="icon" style="color:#fff">💬</div><div class="label">Chat</div></button>
-        <button class="app" onclick="openApp('musik-win')" aria-controls="musik-win"><div class="icon" style="color:#ff3b30">🎵</div><div class="label">Musik</div></button>
-        <button class="app" onclick="openApp('terminal-win')" aria-controls="terminal-win"><div class="icon" style="color:#30d158">🖥️</div><div class="label">Terminal</div></button>
-        <button class="app" onclick="openApp('videos-win')" aria-controls="videos-win"><div class="icon" style="color:var(--accent-orange)">📺</div><div class="label">Videos</div></button>
-        <button class="app" onclick="openApp('options-win')" aria-controls="options-win"><div class="icon" style="color:#8e8e93">⚙️</div><div class="label">Optionen</div></button>
-      </div>
+  <header class="topbar">
+    <div class="brand">lucario109-hub.github.io</div>
+    <button id="open-settings" aria-label="Einstellungen" class="icon-btn">⚙️</button>
+  </header>
 
-      <div id="browser-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Browser</span><button class="close" onclick="closeApp('browser-win')">X</button></div><div class="win-body"><p>Suche im Web...</p></div></div>
-      <div id="cam-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Kamera</span><button class="close" onclick="closeApp('cam-win')">X</button></div><div class="win-body"><div class="camera-container"><div id="camera-error" style="display:none;color:var(--accent-orange)">Warte auf Kamera...</div><video id="camera-stream" autoplay playsinline muted></video></div></div></div>
-      <div id="games-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Games</span><button class="close" onclick="closeApp('games-win')">X</button></div><div class="win-body"><p>Keine Spiele installiert.</p></div></div>
-      <div id="chat-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Chat</span><button class="close" onclick="closeApp('chat-win')">X</button></div><div class="win-body"><p>Keine neuen Nachrichten.</p></div></div>
-      <div id="musik-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Musik</span><button class="close" onclick="closeApp('musik-win')">X</button></div><div class="win-body"><p>Audio-Player bereit.</p></div></div>
-      <div id="terminal-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Terminal</span><button class="close" onclick="closeApp('terminal-win')">X</button></div><div class="win-body"><pre style="width:100%;white-space:pre-wrap;text-align:left;color:var(--muted)">~ $</pre></div></div>
-      <div id="videos-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Videos</span><button class="close" onclick="closeApp('videos-win')">X</button></div><div class="win-body"><p>Video-Bibliothek leer.</p></div></div>
-      <div id="options-win" class="window" role="dialog" aria-hidden="true"><div class="win-header"><span class="win-title">Optionen</span><button class="close" onclick="closeApp('options-win')">X</button></div><div class="win-body"><p>Einstellungen hier.</p></div></div>
+  <main class="screen">
+    <div class="apps-grid" id="appsGrid">
+      <div class="app" data-app="browser">
+        <div class="icon browser"></div>
+        <div class="label">Browser</div>
+      </div>
+      <div class="app" data-app="camera">
+        <div class="icon camera"></div>
+        <div class="label">Kamera</div>
+      </div>
+      <div class="app" data-app="games">
+        <div class="icon games"></div>
+        <div class="label">Games</div>
+      </div>
+      <div class="app" data-app="photos">
+        <div class="icon photos"></div>
+        <div class="label">Bilder</div>
+      </div>
+      <div class="app" data-app="music">
+        <div class="icon music"></div>
+        <div class="label">Musik</div>
+      </div>
+      <div class="app" data-app="terminal">
+        <div class="icon terminal"></div>
+        <div class="label">Terminal</div>
+      </div>
+      <div class="app" data-app="videos">
+        <div class="icon videos"></div>
+        <div class="label">Videos</div>
+      </div>
+      <div class="app" data-app="options">
+        <div class="icon options"></div>
+        <div class="label">Optionen</div>
+      </div>
+    </div>
+  </main>
 
+  <!-- App entry modal -->
+  <div id="appModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <button id="closeApp" class="close">✕</button>
+      <div id="appContent"></div>
     </div>
   </div>
-  <script src="./app.js"></script>
+
+  <!-- Settings modal -->
+  <div id="settingsModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <button id="closeSettings" class="close">✕</button>
+      <h2>Einstellungen</h2>
+
+      <label class="switch-row">
+        <span>Sounds</span>
+        <input id="toggleSounds" type="checkbox" checked />
+      </label>
+
+      <label class="switch-row">
+        <span>Gridgröße</span>
+        <select id="gridSize">
+          <option value="4">4 Spalten</option>
+          <option value="3">3 Spalten</option>
+          <option value="5">5 Spalten</option>
+        </select>
+      </label>
+
+      <label class="switch-row">
+        <span>Theme</span>
+        <select id="themeSelect">
+          <option value="dark">Dunkel</option>
+          <option value="dim">Gedimmt</option>
+          <option value="glass">Glas</option>
+        </select>
+      </label>
+
+      <div class="settings-actions">
+        <button id="saveSettings">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="tapSound" preload="auto"></audio>
+
+  <script src="app.js" defer></script>
 </body>
 </html>

@@ -1,94 +1,134 @@
-// app.js - runtime logic for Modern Minimalist OS PWA
-// 1) Clock & Date
-function updateDateTime(){
-  try{
-    const now = new Date();
-    const timeEl = document.getElementById('live-time');
-    const dateEl = document.getElementById('live-date');
-    if(timeEl) timeEl.textContent = now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-    if(dateEl) dateEl.textContent = now.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});
-  }catch(e){console.error(e)}
+/* name=app.js */
+const appsGrid = document.getElementById('appsGrid')
+const settingsModal = document.getElementById('settingsModal')
+const openSettings = document.getElementById('open-settings')
+const closeSettings = document.getElementById('closeSettings')
+const saveSettings = document.getElementById('saveSettings')
+const toggleSounds = document.getElementById('toggleSounds')
+const themeSelect = document.getElementById('themeSelect')
+const gridSize = document.getElementById('gridSize')
+const tapSound = document.getElementById('tapSound')
+const appModal = document.getElementById('appModal')
+const appContent = document.getElementById('appContent')
+const closeApp = document.getElementById('closeApp')
+
+let settings = {
+  sounds: true,
+  theme: 'dark',
+  cols: 4
 }
-updateDateTime();
-setInterval(updateDateTime, 60_000);
 
-// 2) Battery progress (progressive enhancement)
-async function initBattery(){
-  try{
-    if('getBattery' in navigator){
-      const b = await navigator.getBattery();
-      const update = ()=>{
-        const lvl = Math.round(b.level*100);
-        const el = document.getElementById('bat-level');
-        const txt = document.getElementById('bat-percent') || document.querySelector('.battery span');
-        if(el) el.style.width = lvl + '%';
-        if(txt) txt.textContent = lvl + '%';
-        if(el) el.style.background = lvl<=20 ? '#ff3b30' : (lvl<=50 ? '#ff9f0a' : '#30d158');
-      };
-      update();
-      b.addEventListener('levelchange', update);
-      b.addEventListener('chargingchange', update);
-    }
-  }catch(e){console.warn('Battery init failed',e)}
+try {
+  const saved = JSON.parse(localStorage.getItem('launcherSettings') || 'null')
+  if (saved) settings = {...settings, ...saved}
+} catch(e){console.warn(e)}
+
+function applySettings(){
+  toggleSounds.checked = !!settings.sounds
+  themeSelect.value = settings.theme
+  gridSize.value = settings.cols
+  document.documentElement.setAttribute('data-theme', settings.theme)
+  document.querySelector('.apps-grid').style.gridTemplateColumns = `repeat(${settings.cols}, 1fr)`
 }
-initBattery();
+applySettings()
 
-// 3) PWA install prompt handling
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  // visual hint: highlight options icon if present
-  const opt = document.querySelector('.app[aria-controls="options-win"] .icon') || document.querySelector('.app:nth-child(8) .icon');
-  if(opt) opt.style.boxShadow = '0 0 18px rgba(47,128,237,0.9)';
-});
+openSettings?.addEventListener('click', () => { settingsModal.setAttribute('aria-hidden','false') })
+closeSettings?.addEventListener('click', () => { settingsModal.setAttribute('aria-hidden','true') })
+closeApp?.addEventListener('click', () => { closeAppModal() })
 
-// 4) Window manager (open/close apps)
-let activeStream = null;
-function openApp(id){
-  if(id === 'options-win' && deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(()=>{deferredPrompt = null;});
-    return;
+saveSettings?.addEventListener('click', () => {
+  settings.sounds = toggleSounds.checked
+  settings.theme = themeSelect.value
+  settings.cols = parseInt(gridSize.value,10) || 4
+  localStorage.setItem('launcherSettings', JSON.stringify(settings))
+  applySettings()
+  settingsModal.setAttribute('aria-hidden','true')
+})
+
+appsGrid?.addEventListener('click', (ev) => {
+  let tile = ev.target.closest('.app')
+  if (!tile) return
+  const name = tile.dataset.app
+  if (settings.sounds) { playTap() }
+  openApp(name)
+})
+
+function openApp(name){
+  appModal.setAttribute('aria-hidden','false')
+  switch(name){
+    case 'browser':
+      appContent.innerHTML = `<iframe src="https://lucario109-hub.github.io/mein-handy-os" style="width:100%;height:70vh;border-radius:8px;border:none"></iframe>`
+      break
+    case 'camera':
+      startCamera()
+      break
+    case 'games':
+      appContent.innerHTML = `<div style="padding:24px;font-size:18px">Games Area — Platzhalter</div>`
+      break
+    case 'photos':
+      appContent.innerHTML = `<div style="padding:12px"><div style="width:100%;height:240px;background:linear-gradient(180deg,#222,#111);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#999">Keine Bilder</div></div>`
+      break
+    case 'music':
+      appContent.innerHTML = `<div style="padding:12px">Musik Player — Platzhalter</div>`
+      break
+    case 'terminal':
+      appContent.innerHTML = `<pre style="background:#08111a;color:#4ff;padding:12px;border-radius:8px">$ _</pre>`
+      break
+    default:
+      appContent.innerHTML = `<div style="padding:18px">App ${name}</div>`
   }
-  const win = document.getElementById(id);
-  if(!win) return;
-  // close others
-  document.querySelectorAll('.window.show').forEach(w=>{ w.classList.remove('show'); w.setAttribute('aria-hidden','true'); });
-  win.classList.add('show');
-  win.setAttribute('aria-hidden','false');
-  // update aria-expanded on buttons
-  document.querySelectorAll('.app').forEach(btn=>{ const ctrl = btn.getAttribute('aria-controls'); btn.setAttribute('aria-expanded', ctrl===id ? 'true' : 'false'); });
-  if(id === 'cam-win') startKamera();
 }
 
-function closeApp(id){
-  const win = document.getElementById(id);
-  if(!win) return;
-  win.classList.remove('show');
-  win.setAttribute('aria-hidden','true');
-  document.querySelectorAll('.app[aria-controls="'+id+'"]')
-    .forEach(btn=>btn.setAttribute('aria-expanded','false'));
-  if(id === 'cam-win') stopKamera();
+function closeAppModal(){
+  // stop camera if running
+  const video = document.querySelector('#appContent video')
+  if (video && video.srcObject){
+    const tracks = video.srcObject.getTracks()
+    tracks.forEach(t=>t.stop())
+    video.srcObject = null
+  }
+  appModal.setAttribute('aria-hidden','true')
+  appContent.innerHTML = ''
 }
 
-// allow closing via Escape
-window.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.window.show').forEach(w=>{ w.classList.remove('show'); w.setAttribute('aria-hidden','true'); stopKamera(); document.querySelectorAll('.app').forEach(b=>b.setAttribute('aria-expanded','false')); }); });
-
-// 5) Camera handling
-async function startKamera(){
-  const video = document.getElementById('camera-stream');
-  const errEl = document.getElementById('camera-error');
-  if(errEl) errEl.style.display = 'none';
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ if(errEl) { errEl.style.display='block'; errEl.textContent='Kamera nicht unterstützt.'; } return; }
+async function startCamera(){
+  appContent.innerHTML = `<video id="camPreview" autoplay playsinline style="width:100%;height:60vh;border-radius:8px;background:#000"></video>`
+  const video = document.getElementById('camPreview')
   try{
-    activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-    if('srcObject' in video) video.srcObject = activeStream; else video.src = URL.createObjectURL(activeStream);
-    await video.play().catch(()=>{});
-  }catch(err){ console.warn('camera error', err); if(errEl) { errEl.style.display='block'; errEl.textContent='Kamera-Zugriff verweigert oder nicht verfügbar.';} }
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false})
+    video.srcObject = stream
+  }catch(e){
+    appContent.innerHTML = `<div style="padding:24px;color:#f66">Kamera nicht verfügbar: ${e.message}</div>`
+  }
 }
-function stopKamera(){ if(activeStream){ activeStream.getTracks().forEach(t=>t.stop()); activeStream = null; } const v = document.getElementById('camera-stream'); if(v){ try{ v.pause(); v.srcObject = null; }catch(e){} } }
-window.addEventListener('pagehide', stopKamera); window.addEventListener('beforeunload', stopKamera);
 
-// 6) Service worker registration
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').then(r=>console.log('SW registered',r.scope)).catch(e=>console.warn('SW failed',e)); }); }
+// playTap: use audio element if src present, otherwise WebAudio beep
+function playTap(){
+  if (tapSound && tapSound.src){
+    tapSound.currentTime = 0; tapSound.play().catch(()=>{})
+    return
+  }
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const o = ctx.createOscillator()
+    const g = ctx.createGain()
+    o.type = 'sine'
+    o.frequency.value = 800
+    g.gain.value = 0.0001
+    o.connect(g); g.connect(ctx.destination)
+    const now = ctx.currentTime
+    g.gain.setValueAtTime(0.0001, now)
+    g.gain.exponentialRampToValueAtTime(0.2, now + 0.005)
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
+    o.start(now); o.stop(now + 0.12)
+    setTimeout(()=>{ try{ ctx.close() }catch(e){} }, 200)
+  }catch(e){ /* ignore */ }
+}
+
+// keyboard accessibility
+window.addEventListener('keydown', (e)=>{
+  if (e.key === 'Escape'){
+    if (settingsModal.getAttribute('aria-hidden') === 'false') closeSettings?.click()
+    if (appModal.getAttribute('aria-hidden') === 'false') closeApp?.click()
+  }
+})
