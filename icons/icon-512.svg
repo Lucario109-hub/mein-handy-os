@@ -1,65 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <!-- Rounded square glossy background -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">
   <defs>
-    <linearGradient id="bgGrad" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#071426"/>
-      <stop offset="100%" stop-color="#081524"/>
+    <!-- Background gradients -->
+    <linearGradient id="bgMain" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#041026"/>
+      <stop offset="50%" stop-color="#07122a"/>
+      <stop offset="100%" stop-color="#000814"/>
     </linearGradient>
-    <radialGradient id="innerGlow" cx="40%" cy="35%" r="60%">
-      <stop offset="0%" stop-color="#0b2a5a" stop-opacity="0.45"/>
-      <stop offset="60%" stop-color="#001018" stop-opacity="0.0"/>
+
+    <radialGradient id="centerGlow" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#083660" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#021424" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.0"/>
     </radialGradient>
+
+    <!-- Ring gradient -->
     <linearGradient id="ringGrad" x1="0" x2="1">
-      <stop offset="0%" stop-color="#7fe0ff" stop-opacity="1"/>
-      <stop offset="45%" stop-color="#2fb0ff" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#0a6cff" stop-opacity="1"/>
+      <stop offset="0%" stop-color="#9ff3ff"/>
+      <stop offset="35%" stop-color="#3ad0ff"/>
+      <stop offset="70%" stop-color="#1588ff"/>
+      <stop offset="100%" stop-color="#0b4cff"/>
     </linearGradient>
-    <radialGradient id="starGrad" cx="50%" cy="42%" r="55%">
-      <stop offset="0%" stop-color="#e6f9ff" stop-opacity="1"/>
-      <stop offset="60%" stop-color="#74c8ff" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#1a8aff" stop-opacity="0.8"/>
+
+    <!-- star gradient -->
+    <radialGradient id="starGrad" cx="50%" cy="48%" r="60%">
+      <stop offset="0%" stop-color="#eaffff"/>
+      <stop offset="40%" stop-color="#bfeaff"/>
+      <stop offset="100%" stop-color="#56b7ff"/>
     </radialGradient>
-    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="10" result="b"/>
-      <feOffset dx="0" dy="6" in="b" result="c"/>
+
+    <!-- bloom filter for glow -->
+    <filter id="bloom" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur1"/>
+      <feColorMatrix in="blur1" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="col1"/>
       <feMerge>
-        <feMergeNode in="c"/>
+        <feMergeNode in="col1"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
+
+    <!-- subtle inner rim highlight -->
+    <linearGradient id="rim" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0da7ff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#0b3cff" stop-opacity="0.06"/>
+    </linearGradient>
+
+    <!-- small shine gradient -->
+    <linearGradient id="shine" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
   </defs>
 
-  <!-- background rounded rect -->
-  <rect x="16" y="16" width="480" height="480" rx="80" ry="80" fill="url(#bgGrad)" />
+  <!-- rounded glossy background -->
+  <rect x="12" y="12" width="488" height="488" rx="82" ry="82" fill="url(#bgMain)" />
 
-  <!-- inner glossy overlay -->
-  <rect x="28" y="28" width="456" height="456" rx="72" ry="72" fill="url(#innerGlow)" />
+  <!-- inner vignette + subtle center glow -->
+  <rect x="28" y="28" width="456" height="456" rx="72" ry="72" fill="url(#centerGlow)" />
 
-  <!-- subtle rim highlight -->
-  <path d="M96 48 C140 24, 372 24, 416 48 L416 48 C444 64, 480 102, 480 144 L480 368 C480 410, 444 448, 416 464 C372 488, 140 488, 96 464 C68 448, 32 410, 32 368 L32 144 C32 102, 68 64, 96 48 Z" fill="none" stroke="rgba(120,200,255,0.06)" stroke-width="6"/>
+  <!-- top-right glass highlight -->
+  <path d="M370 48 C390 56, 420 82, 430 110" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M330 36 C360 34, 410 46, 440 86" stroke="rgba(255,255,255,0.06)" stroke-width="4" fill="none" stroke-linecap="round"/>
 
-  <!-- orbit ring (elliptical) -->
+  <!-- inner concentric halo rings for depth -->
+  <g opacity="0.14">
+    <ellipse cx="256" cy="256" rx="170" ry="170" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="36"/>
+    <ellipse cx="256" cy="256" rx="120" ry="120" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="24"/>
+  </g>
+
+  <!-- orbit ring with glow duplicates -->
   <g transform="translate(256,256)">
-    <ellipse rx="190" ry="98" fill="none" stroke="url(#ringGrad)" stroke-width="28" stroke-linecap="round" transform="rotate(-25)" opacity="0.98" />
-    <!-- subtle inner ring for depth -->
-    <ellipse rx="160" ry="82" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="20" transform="rotate(-25)"/>
+    <!-- soft blurred ring for light bleed -->
+    <ellipse rx="196" ry="96" fill="none" stroke="url(#ringGrad)" stroke-width="34" stroke-linecap="round" transform="rotate(-24)" opacity="0.18" filter="url(#bloom)"/>
+    <!-- main ring -->
+    <ellipse rx="196" ry="96" fill="none" stroke="url(#ringGrad)" stroke-width="18" stroke-linecap="round" transform="rotate(-24)" opacity="0.98"/>
+    <!-- inner subtle ring for depth -->
+    <ellipse rx="170" ry="82" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="12" transform="rotate(-24)"/>
   </g>
 
-  <!-- star shape (4-point stylized) -->
-  <g filter="url(#softShadow)">
-    <path d="M256 128 L272 208 L352 224 L272 240 L256 320 L240 240 L160 224 L240 208 Z" fill="url(#starGrad)" transform="translate(0,0) scale(1)" opacity="0.98"/>
-    <!-- smooth inner glow on star -->
-    <path d="M256 148 L268 208 L316 220 L268 232 L256 292 L244 232 L196 220 L244 208 Z" fill="rgba(255,255,255,0.12)" opacity="0.9"/>
+  <!-- star (sharper 4-point) with bloom and inner highlights -->
+  <g transform="translate(256,256)" filter="url(#bloom)">
+    <!-- sharp diamond star path -->
+    <path d="M0 -92 L32 -8 L92 0 L32 8 L0 92 L-32 8 L-92 0 L-32 -8 Z" fill="url(#starGrad)" stroke="rgba(255,255,255,0.18)" stroke-width="2" />
   </g>
 
-  <!-- top-right glossy flare on the rounded rect -->
-  <path d="M376 48 C396 56, 430 80, 440 112" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- inner star highlight for crisp center -->
+  <g transform="translate(256,256)">
+    <path d="M0 -62 L18 -8 L62 0 L18 8 L0 62 L-18 8 L-62 0 L-18 -8 Z" fill="rgba(255,255,255,0.65)" opacity="0.95"/>
+    <!-- tiny bright cross center -->
+    <path d="M-6 -2 L0 -54 L6 -2 L54 0 L6 2 L0 54 L-6 2 L-54 0 Z" fill="rgba(255,255,255,0.92)" opacity="0.85" transform="scale(0.12)" />
+  </g>
 
-  <!-- outer vignette -->
-  <rect x="16" y="16" width="480" height="480" rx="80" ry="80" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="10"/>
+  <!-- small reflections on ring to mimic highlights -->
+  <g transform="translate(256,256) rotate(-24)">
+    <path d="M120 -40 C160 -24, 198 0, 220 20" stroke="rgba(255,255,255,0.28)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.28"/>
+    <path d="M-130 30 C-100 16, -60 8, -10 0" stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.12"/>
+  </g>
 
-  <!-- small rim glow to match original blue accent -->
-  <rect x="24" y="24" width="464" height="464" rx="72" ry="72" fill="none" stroke="rgba(30,140,255,0.06)" stroke-width="8"/>
+  <!-- subtle outer rim glow -->
+  <rect x="20" y="20" width="472" height="472" rx="76" ry="76" fill="none" stroke="url(#rim)" stroke-width="8" />
 
 </svg>
