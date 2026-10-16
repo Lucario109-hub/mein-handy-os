@@ -247,8 +247,8 @@ function initTicTacToe(){
   }
   function check(){
     const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for(const l of lines){ const [a,b,c]=l; if(state.cells[a] && state.cells[a]===state.cells[b] && state.cells[a]===state.cells[c]){ state.over=true; alert('Spiel vorbei: ' + state.cells[a]); return; } }
-    if(state.cells.every(Boolean)){ state.over=true; alert('Unentschieden'); }
+    for(const l of lines){ const [a,b,c]=l; if(state.cells[a] && state.cells[a]===state.cells[b] && state.cells[a]===state.cells[c]){ state.over=true; setTimeout(()=>alert('Spiel vorbei: ' + state.cells[a]),0); return; } }
+    if(state.cells.every(Boolean)){ state.over=true; setTimeout(()=>alert('Unentschieden'),0); }
   }
   const reset = document.createElement('button'); reset.textContent='Neustart'; reset.onclick=()=>{ state.cells.fill(null); state.turn='X'; state.over=false; render(); };
   root.appendChild(board); root.appendChild(reset); render();
@@ -260,21 +260,26 @@ function initMemory(){
   if(!root) return;
   root.innerHTML='';
   const symbols = ['🍎','🍌','🍇','🍒','🍋','🍑'];
-  const cards = symbols.concat(symbols).sort(()=>Math.random()-0.5);
+  let cards = symbols.concat(symbols).sort(()=>Math.random()-0.5);
   const state = { open: [], matched: [] };
   const grid = document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(4,56px)'; grid.style.gap='6px'; grid.style.marginBottom='8px';
   function render(){ grid.innerHTML=''; cards.forEach((s,i)=>{
     const b = document.createElement('button'); b.style.width='56px'; b.style.height='56px'; b.style.fontSize='22px';
-    if(state.matched.includes(i) || state.open.includes(i)) b.textContent = s; else b.textContent='';
-    b.onclick = ()=>{ if(state.open.includes(i) || state.matched.includes(i)) return; state.open.push(i); if(state.open.length===2){ const [a,b]=state.open; if(cards[a]===cards[b]){ state.matched.push(a,b); state.open=[]; if(state.matched.length===cards.length) setTimeout(()=>alert('Gewonnen!'),100); } else { setTimeout(()=>{ state.open=[]; render(); },600); } } render(); };
+    if(state.matched.includes(i) || state.open.includes(i)) b.textContent = s; else b.textContent = '';
+    b.onclick = ()=>{
+      if(state.open.includes(i) || state.matched.includes(i)) return;
+      state.open.push(i);
+      render();
+      if(state.open.length===2){ const [a,bIdx]=state.open; if(cards[a]===cards[bIdx]){ state.matched.push(a); state.matched.push(bIdx); state.open = []; setTimeout(()=>render(),300); } else { setTimeout(()=>{ state.open=[]; render(); },600); } }
+    };
     grid.appendChild(b);
   }); }
-  const reset = document.createElement('button'); reset.textContent='Neustart'; reset.onclick=()=>{ cards.sort(()=>Math.random()-0.5); state.open=[]; state.matched=[]; render(); };
+  const reset = document.createElement('button'); reset.textContent='Neustart'; reset.onclick=()=>{ cards = symbols.concat(symbols).sort(()=>Math.random()-0.5); state.open=[]; state.matched=[]; render(); };
   root.appendChild(grid); root.appendChild(reset); render();
 }
 
 // --- 7) Service worker registration ---
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').then(r=>console.log('SW registered',r.scope)).catch(e=>console.warn('SW failed',e)); }); }
+if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').then(r=>console.log('SW registered',r.scope)).catch(e=>console.warn('SW failed', e)); }); }
 
 // expose some functions to the window so HTML buttons can call them
 window.openApp = openApp;
