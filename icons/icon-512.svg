@@ -1,17 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Rounded square glossy background -->
   <defs>
-    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#2f80ed"/>
-      <stop offset="1" stop-color="#0b0c10"/>
+    <linearGradient id="bgGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#071426"/>
+      <stop offset="100%" stop-color="#081524"/>
     </linearGradient>
+    <radialGradient id="innerGlow" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#0b2a5a" stop-opacity="0.45"/>
+      <stop offset="60%" stop-color="#001018" stop-opacity="0.0"/>
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="0" x2="1">
+      <stop offset="0%" stop-color="#7fe0ff" stop-opacity="1"/>
+      <stop offset="45%" stop-color="#2fb0ff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#0a6cff" stop-opacity="1"/>
+    </linearGradient>
+    <radialGradient id="starGrad" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#e6f9ff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#74c8ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#1a8aff" stop-opacity="0.8"/>
+    </radialGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feOffset dx="0" dy="6" in="b" result="c"/>
+      <feMerge>
+        <feMergeNode in="c"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="96" fill="#0b0c10" />
-  <rect x="46" y="46" width="420" height="420" rx="84" fill="url(#g)" opacity="0.92"/>
-  <rect x="136" y="136" width="240" height="240" rx="52" fill="#ffffff" opacity="0.12"/>
-  <g stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M166 260h180" />
-    <path d="M166 310h150" />
-    <path d="M166 360h192" />
-    <path d="M166 410h128" />
+
+  <!-- background rounded rect -->
+  <rect x="16" y="16" width="480" height="480" rx="80" ry="80" fill="url(#bgGrad)" />
+
+  <!-- inner glossy overlay -->
+  <rect x="28" y="28" width="456" height="456" rx="72" ry="72" fill="url(#innerGlow)" />
+
+  <!-- subtle rim highlight -->
+  <path d="M96 48 C140 24, 372 24, 416 48 L416 48 C444 64, 480 102, 480 144 L480 368 C480 410, 444 448, 416 464 C372 488, 140 488, 96 464 C68 448, 32 410, 32 368 L32 144 C32 102, 68 64, 96 48 Z" fill="none" stroke="rgba(120,200,255,0.06)" stroke-width="6"/>
+
+  <!-- orbit ring (elliptical) -->
+  <g transform="translate(256,256)">
+    <ellipse rx="190" ry="98" fill="none" stroke="url(#ringGrad)" stroke-width="28" stroke-linecap="round" transform="rotate(-25)" opacity="0.98" />
+    <!-- subtle inner ring for depth -->
+    <ellipse rx="160" ry="82" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="20" transform="rotate(-25)"/>
   </g>
+
+  <!-- star shape (4-point stylized) -->
+  <g filter="url(#softShadow)">
+    <path d="M256 128 L272 208 L352 224 L272 240 L256 320 L240 240 L160 224 L240 208 Z" fill="url(#starGrad)" transform="translate(0,0) scale(1)" opacity="0.98"/>
+    <!-- smooth inner glow on star -->
+    <path d="M256 148 L268 208 L316 220 L268 232 L256 292 L244 232 L196 220 L244 208 Z" fill="rgba(255,255,255,0.12)" opacity="0.9"/>
+  </g>
+
+  <!-- top-right glossy flare on the rounded rect -->
+  <path d="M376 48 C396 56, 430 80, 440 112" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- outer vignette -->
+  <rect x="16" y="16" width="480" height="480" rx="80" ry="80" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="10"/>
+
+  <!-- small rim glow to match original blue accent -->
+  <rect x="24" y="24" width="464" height="464" rx="72" ry="72" fill="none" stroke="rgba(30,140,255,0.06)" stroke-width="8"/>
+
 </svg>
