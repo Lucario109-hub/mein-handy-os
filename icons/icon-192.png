@@ -1,1 +1,16 @@
-iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#2f80ed"/>
+      <stop offset="1" stop-color="#0b0c10"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="34" fill="#0b0c10" />
+  <rect x="12" y="12" width="168" height="168" rx="28" fill="url(#g)" opacity="0.92"/>
+  <rect x="44" y="44" width="104" height="104" rx="20" fill="#ffffff" opacity="0.12"/>
+  <g stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M60 88h72" />
+    <path d="M60 106h56" />
+    <path d="M60 124h72" />
+  </g>
+</svg>

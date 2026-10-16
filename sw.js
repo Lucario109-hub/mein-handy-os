@@ -1,14 +1,12 @@
-// sw.js - robust service worker for PWA (updated to precache PNG fallbacks)
-const CACHE_NAME = 'mos-v2';
+// sw.js - robust service worker for PWA
+const CACHE_NAME = 'mos-v1';
 const PRECACHE_URLS = [
   './',
   './index.html',
   './manifest.json',
   './app.js',
   './icons/icon-192.svg',
-  './icons/icon-512.svg',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.svg'
 ];
 
 self.addEventListener('install', event => {
@@ -35,9 +33,6 @@ self.addEventListener('fetch', event => {
 
   if (isNavigation) {
     event.respondWith(networkFirst(req));
-  } else if (req.destination === 'image') {
-    // images: cache-first
-    event.respondWith(cacheFirst(req));
   } else {
     event.respondWith(cacheFirst(req));
   }
@@ -54,10 +49,7 @@ async function networkFirst(request) {
   } catch (err) {
     const cached = await caches.match(request);
     if (cached) return cached;
-    // navigation fallback to index.html
-    const nav = await caches.match('./index.html');
-    if (nav) return nav;
-    return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+    return (await caches.match('./index.html')) || new Response('Offline', { status: 503 });
   }
 }
 
@@ -72,6 +64,6 @@ async function cacheFirst(request) {
     }
     return response;
   } catch (err) {
-    return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+    return new Response('Offline', { status: 503 });
   }
 }
