@@ -15,10 +15,13 @@
     </div>
     <div class="top-right">
       <div id="statusClock" class="status-clock" aria-hidden="true"></div>
-      <div id="battery" class="battery" aria-hidden="true">
-        <div class="battery-level" id="batteryLevel"></div>
-        <div class="battery-tip"></div>
-        <div class="battery-charging" id="batteryCharging" aria-hidden="true">⚡</div>
+      <div id="batteryWrap" style="display:flex;align-items:center;gap:8px">
+        <div id="battery" class="battery" aria-hidden="true">
+          <div class="battery-level" id="batteryLevel"></div>
+          <div class="battery-tip"></div>
+          <div class="battery-charging" id="batteryCharging" aria-hidden="true">⚡</div>
+        </div>
+        <div id="batteryPercent" style="color:var(--muted);font-size:13px">77%</div>
       </div>
     </div>
   </header>
@@ -59,6 +62,12 @@
         <div class="icon options" aria-hidden="true"><img src="icons/options.svg" alt=""/></div>
         <div class="label">Optionen</div>
       </div>
+
+      <!-- add placeholders so grid can scroll if needed -->
+      <div class="app placeholder" aria-hidden="true"></div>
+      <div class="app placeholder" aria-hidden="true"></div>
+      <div class="app placeholder" aria-hidden="true"></div>
+      <div class="app placeholder" aria-hidden="true"></div>
     </div>
   </main>
 
