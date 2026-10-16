@@ -1,0 +1,54 @@
+name: Render icons from SVG
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  render-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Install image tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin imagemagick
+
+      - name: Render PNGs from SVGs
+        run: |
+          set -e
+          cd $GITHUB_WORKSPACE
+          mkdir -p icons
+          if [ -f icons/icon-512.svg ]; then
+            echo "Rendering icon-512.png from icon-512.svg"
+            rsvg-convert -w 512 -h 512 icons/icon-512.svg -o icons/icon-512.png || convert -background none -density 144 icons/icon-512.svg -resize 512x512 icons/icon-512.png
+          fi
+          if [ -f icons/icon-192.svg ]; then
+            echo "Rendering icon-192.png from icon-192.svg"
+            rsvg-convert -w 192 -h 192 icons/icon-192.svg -o icons/icon-192.png || convert -background none -density 144 icons/icon-192.svg -resize 192x192 icons/icon-192.png
+            echo "Rendering icon-180.png from icon-192.svg"
+            rsvg-convert -w 180 -h 180 icons/icon-192.svg -o icons/icon-180.png || convert -background none -density 144 icons/icon-192.svg -resize 180x180 icons/icon-180.png
+          fi
+
+      - name: Commit and push generated PNGs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add icons/icon-180.png icons/icon-192.png icons/icon-512.png || true
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(icons): render PNGs from SVGs (auto-generated)"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit"
+          fi
