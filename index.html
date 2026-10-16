@@ -9,71 +9,75 @@
 <body>
   <header class="topbar">
     <div class="brand">lucario109-hub.github.io</div>
-    <button id="open-settings" aria-label="Einstellungen" class="icon-btn">⚙️</button>
+    <div class="top-actions">
+      <button id="open-settings" aria-label="Einstellungen" class="icon-btn">⚙️</button>
+    </div>
   </header>
 
-  <main class="screen">
-    <div class="apps-grid" id="appsGrid">
-      <div class="app" data-app="browser">
-        <div class="icon browser"></div>
+  <main class="screen" id="screenRoot">
+    <div class="apps-grid" id="appsGrid" role="list">
+      <div class="app" data-app="browser" role="listitem" tabindex="0">
+        <div class="icon browser" aria-hidden="true"></div>
         <div class="label">Browser</div>
       </div>
-      <div class="app" data-app="camera">
-        <div class="icon camera"></div>
+      <div class="app" data-app="camera" role="listitem" tabindex="0">
+        <div class="icon camera" aria-hidden="true"></div>
         <div class="label">Kamera</div>
       </div>
-      <div class="app" data-app="games">
-        <div class="icon games"></div>
+      <div class="app" data-app="games" role="listitem" tabindex="0">
+        <div class="icon games" aria-hidden="true"></div>
         <div class="label">Games</div>
       </div>
-      <div class="app" data-app="photos">
-        <div class="icon photos"></div>
-        <div class="label">Bilder</div>
+      <div class="app" data-app="chat" role="listitem" tabindex="0">
+        <div class="icon chat" aria-hidden="true"></div>
+        <div class="label">Chat</div>
       </div>
-      <div class="app" data-app="music">
-        <div class="icon music"></div>
+
+      <div class="app" data-app="music" role="listitem" tabindex="0">
+        <div class="icon music" aria-hidden="true"></div>
         <div class="label">Musik</div>
       </div>
-      <div class="app" data-app="terminal">
-        <div class="icon terminal"></div>
+      <div class="app" data-app="terminal" role="listitem" tabindex="0">
+        <div class="icon terminal" aria-hidden="true"></div>
         <div class="label">Terminal</div>
       </div>
-      <div class="app" data-app="videos">
-        <div class="icon videos"></div>
+      <div class="app" data-app="videos" role="listitem" tabindex="0">
+        <div class="icon videos" aria-hidden="true"></div>
         <div class="label">Videos</div>
       </div>
-      <div class="app" data-app="options">
-        <div class="icon options"></div>
+      <div class="app" data-app="options" role="listitem" tabindex="0">
+        <div class="icon options" aria-hidden="true"></div>
         <div class="label">Optionen</div>
       </div>
     </div>
   </main>
 
   <!-- App entry modal -->
-  <div id="appModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <button id="closeApp" class="close">✕</button>
-      <div id="appContent"></div>
+  <div id="appModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="appTitle">
+    <div class="modal-card" role="document">
+      <button id="closeApp" class="close" aria-label="Schließen">✕</button>
+      <h3 id="appTitle" class="visually-hidden">App</h3>
+      <div id="appContent" class="app-content" tabindex="0"></div>
     </div>
   </div>
 
   <!-- Settings modal -->
-  <div id="settingsModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <button id="closeSettings" class="close">✕</button>
-      <h2>Einstellungen</h2>
+  <div id="settingsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="settingsTitle">
+    <div class="modal-card" role="document">
+      <button id="closeSettings" class="close" aria-label="Schließen Einstellungen">✕</button>
+      <h2 id="settingsTitle">Einstellungen</h2>
 
       <label class="switch-row">
         <span>Sounds</span>
-        <input id="toggleSounds" type="checkbox" checked />
+        <input id="toggleSounds" type="checkbox" />
       </label>
 
       <label class="switch-row">
-        <span>Gridgröße</span>
+        <span>Grid Spalten</span>
         <select id="gridSize">
-          <option value="4">4 Spalten</option>
-          <option value="3">3 Spalten</option>
-          <option value="5">5 Spalten</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
         </select>
       </label>
 
@@ -85,6 +89,8 @@
           <option value="glass">Glas</option>
         </select>
       </label>
+
+      <div class="divider"></div>
 
       <div class="settings-actions">
         <button id="saveSettings">Speichern</button>
